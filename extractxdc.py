@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import os
 import re
@@ -99,7 +101,7 @@ def parseArgs():
 if __name__ == "__main__":
     args = parseArgs()
     XdcParser = SearchXDC(args.infile, args.outfile)
-    XdcParser.searchFile(args.pattern)
+    XdcParser.searchFile(args.pattern, args.ignorecase)
     XdcParser.writeMatches(args.verbose)
     exit(0)
 
