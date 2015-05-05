@@ -47,12 +47,12 @@ class SearchXDC:
 
         self.searchFile(SearchPattern, CaseInsensitive)
 
-    def searchPin(self, PatternList = None, CaseInsensitive = False, SortResults = True):
+    def searchPin(self, PatternList = None, SortResults = True):
         CombinedPattern = "|".join(args.pattern)
         Expression = "(?:"+CombinedPattern+")"
         SearchPattern = r"(.*?PACKAGE_PIN\s*?"+Expression+r"\s*?.*?\])"
 
-        self.searchFile(SearchPattern, CaseInsensitive)
+        self.searchFile(SearchPattern, CaseInsensitive = True)
 
     def printMatches(self):
         print self.HeaderString
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     args = parseArgs()
     XdcParser = SearchXDC(args.infile, args.outfile)
     if args.pin:
-        XdcParser.searchPin(args.pattern, args.ignorecase)
+        XdcParser.searchPin(args.pattern)
     else:
         XdcParser.searchPort(args.pattern, args.ignorecase)
     XdcParser.writeMatches(args.verbose)
