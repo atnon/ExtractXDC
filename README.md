@@ -11,14 +11,15 @@ Running the script from prompt with the help flag
 
 yields:
 
-    usage: extractxdc.py [-h] [-o OUTFILE] [-v] [-i] infile pattern [pattern ...]
-  
+    usage: extractxdc.py [-h] [-o OUTFILE] [-v] [-i] [-p]
+                         infile pattern [pattern ...]
+    
     Extract ports from .xdc file given regular expression.
-  
+    
     positional arguments:
       infile                Input file to read.
       pattern               Search patterns for port searching.
-
+    
     optional arguments:
       -h, --help            show this help message and exit
       -o OUTFILE, --outfile OUTFILE
@@ -27,14 +28,19 @@ yields:
                             stdout.
       -i, --ignorecase      If set, regular expression matching will ignore case
                             when searching.
+      -p, --pin             Search for package pin.
 
 ## Patterns
 The script reads the file and applies the regex to it. In order to make entering the regex a bit easier, 
 the user only enters part of the full regex.
 
-The regex in full is:
+The regex for the port search in full is:
 
     /(.*?\[get_ports (.*?<USER EXPRESSION>.*?)\].*?)/gm
+
+The regex for the pin search on the other hand is:
+
+    /(.*?PACKAGE_PIN\s*?<USER EXPRESSION>\s*?.*?\])/gmi
 
 Pretty fuzzy, but works most of the time. 
 
