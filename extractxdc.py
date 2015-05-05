@@ -25,12 +25,8 @@ class SearchXDC:
             Data = InFile.read()
         return Data
 
-    def searchFile(self, PatternList = None, CaseInsensitive = False, SortResults = True):
-        if PatternList:
-            CombinedPattern = "|".join(args.pattern)
-            Expression = "(?:"+CombinedPattern+")"
-
-            SearchPattern = r"(.*?\[get_ports (.*?"+Expression+".*?)\].*?)"
+    def searchFile(self, SearchPattern = None, CaseInsensitive = False, SortResults = True):
+        if SearchPattern:
             SearchFlags = re.MULTILINE
 
             if CaseInsensitive:
@@ -44,10 +40,24 @@ class SearchXDC:
             else:
                 self.Matches = Matches
 
+    def searchPort(self, PatternList = None, CaseInsensitive = False, SortResults = True):
+        CombinedPattern = "|".join(args.pattern)
+        Expression = "(?:"+CombinedPattern+")"
+        SearchPattern = r"(.*?\[get_ports .*?"+Expression+r".*?\].*?)"
+
+        self.searchFile(SearchPattern, CaseInsensitive)
+
+    def searchPin(self, PatternList = None, CaseInsensitive = False, SortResults = True):
+        CombinedPattern = "|".join(args.pattern)
+        Expression = "(?:"+CombinedPattern+")"
+        SearchPattern = r"(.*?PACKAGE_PIN\s*?"+Expression+r"\s*?.*?\])"
+
+        self.searchFile(SearchPattern, CaseInsensitive)
+
     def printMatches(self):
         print self.HeaderString
         for match in self.Matches:
-            print match[0]
+            print match
 
     def writeMatches(self, Verbose = False):
         if Verbose and (self.OutFile != sys.stdout):
@@ -56,7 +66,7 @@ class SearchXDC:
             with self.OutFile as OutFile:
                 OutFile.write(self.HeaderString)
                 for match in self.Matches:
-                    OutFile.write(match[0]+"\n")
+                    OutFile.write(match+"\n")
         else:
             print "No output written, no output file specified."
 
@@ -95,13 +105,22 @@ def parseArgs():
         help="If set, regular expression matching will ignore case when searching."
         )
 
+    parser.add_argument(
+        "-p", "--pin",
+        action="store_true",
+        help="Search for package pin."
+        )
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parseArgs()
     XdcParser = SearchXDC(args.infile, args.outfile)
-    XdcParser.searchFile(args.pattern, args.ignorecase)
+    if args.pin:
+        XdcParser.searchPin(args.pattern, args.ignorecase)
+    else:
+        XdcParser.searchPort(args.pattern, args.ignorecase)
     XdcParser.writeMatches(args.verbose)
     exit(0)
 
